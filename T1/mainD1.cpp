@@ -4,14 +4,22 @@
 #include <ctype.h>
 #include <math.h>
 #include <iostream>
-#include "extras.h"
+//#include "extras.h"
 #include <vector>
-#include "Titulo.h"
+//#include "Titulo.h"
 #include <cmath>
+<<<<<<< HEAD
 #include "extrasD1.h"
 #include "camera.h"
 #include <fstream>
 #define M_PI   3.14159265358979323846264338327950288
+=======
+#include <fstream>
+#include "extras.h"
+#include "camera.h"
+#include "Titulo.h"
+
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
 using namespace std;
 
@@ -28,6 +36,24 @@ class triangle
 {
 public:
     vertice v[3];
+};
+
+class face
+{
+public:
+    int nVertices;
+    std::vector<vertice> verticesFace;
+    vertice vetorNormal;
+};
+
+class objeto
+{
+public:
+    float posY, posX;
+    float zdist;
+    std::vector<face> facesImg;
+    float material[13];
+    int nTriang=0;
 };
 
 class grupo
@@ -68,8 +94,47 @@ float esp=0.5f;
 int ultimaAltura;
 bool apagarTela, telaCheia = false, modoNavegacao = true, modoPly = true;
 int indice=0;
+<<<<<<< HEAD
 FILE *arquivo = nullptr;
  Camera cam;
+=======
+
+ifstream arquivoPly;
+std::string str;
+int numeroVertices;
+int numeroFaces;
+int numeroPropriedades = -1;
+std::vector<vertice> verticesImg;
+std::vector<face> facesImg;
+bool wireframe = false;
+float maiorY=-1000;
+float menorY=10000;
+float maiorX=-1000;
+float menorX=1000;
+float maiorZ=-1000;
+
+bool modoNavegacao = false;
+
+float posCamX, posCamZ;
+
+Camera g_camera;
+bool 	g_key[256];
+bool 	g_shift_down = false;
+int 	g_viewport_width = 0;
+int 	g_viewport_height = 0;
+bool 	g_mouse_left_down = false;
+bool	g_mouse_right_down = false;
+bool	fullscreen = false;	// Fullscreen Flag Set To Fullscreen Mode By Default
+bool 	inverseMouse = false;
+bool	boostSpeed = false; // Change keyboard speed
+bool  flyMode = false;
+bool	releaseMouse = false;
+
+// Movement settings
+float g_translation_speed = 0.05;
+float g_rotation_speed = M_PI/180*0.2;
+float initialY = 2; // initial height of the camera (flymode off value)
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
 vertice initialVerticesV1 = {-1.0f, -1.0f,  0.0f};
 vertice initialVerticesV2 = { 1.0f, -1.0f,  0.0f};
@@ -82,6 +147,7 @@ vertice lastVertice2 = initialVerticesV2;
 std::vector<vertice> vert;
 std::vector<triangle> triang;
 std::vector<grupo> grupos;
+
 
 grupo gr;
 bool 	g_key[256];
@@ -122,7 +188,45 @@ float maiorZ=-1000;
 
 
 /// Functions
+<<<<<<< HEAD
 Titulo *barraT = new Titulo((char*)"ALTURA: ", (char*)" GRUPO", altura, grupoAtual);
+=======
+Titulo *barraT = new Titulo((char*)"ALTURA: ", (char*)" GRUPO", altura);
+
+void init(void)
+{
+    posCamX = 0;
+    posCamZ = 0;
+    //initLight(width, height); // Função extra para tratar iluminação.
+    g_camera.SetPos(posCamX,0,posCamZ);
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);                 // Habilita luz
+    glEnable(GL_LIGHT0);
+    glEnable(GL_CULL_FACE);
+   // glFrontFace(GL_CW);
+    // glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
+    // glDisable(GL_CULL_FACE);
+
+    // Cor da fonte de luz (RGBA)
+    GLfloat cor_luz[]     = { 1.0, 1.0, 1.0, 1.0};
+    // Posicao da fonte de luz. Ultimo parametro define se a luz sera direcional (0.0) ou tera uma posicional (1.0)
+    GLfloat posicao_luz[] = { 50.0, 50.0, 50.0, 1.0};
+
+    // Define parametros da luz
+    glLightfv(GL_LIGHT0, GL_AMBIENT, cor_luz);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, cor_luz);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, cor_luz);
+    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
+
+    setMaterial();
+
+    grupos.push_back(gr);
+
+
+}
+
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 /* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do triângulo;
   v_2
   ^
@@ -164,6 +268,7 @@ void CalculaNormal(triangle t, vertice *vn)
     vn->z /= len;
 }
 
+<<<<<<< HEAD
 void CalculaNormalPly(face t, vertice *vn)
 {
     vertice v_0 = t.verticesFace[0],
@@ -428,6 +533,9 @@ void init(void)
     leArquivoPly(arquivoPly, 20,3);
 
 }
+=======
+///-------------------------------------------------------------T1-------------------------------------------------------------
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
 vertice calculaPerpendicular(vertice v1, vertice v2, float h){
 
@@ -495,6 +603,10 @@ void drawObject()
                     {v2[3], v[3],v[2]}
                 };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
                 glBegin(GL_TRIANGLES);
                 for(int i = 0; i < 2; i++) // triangulos
                 {
@@ -548,6 +660,178 @@ void drawObject()
 
 }
 
+///------------------------------------------------------------T1---------------------------------------------------------------
+///------------------------------------------------------------D2---------------------------------------------------------------
+
+void leArquivoPly(std::ifstream& arquivo)
+{
+
+    objeto obj;
+    bool leArquivo=true;
+
+    while(leArquivo)
+    {
+        arquivo >> str;
+        if(str=="property")
+            numeroPropriedades++;
+        else
+        {
+
+            if(str=="vertex")
+                arquivo >> numeroVertices;
+            else
+            {
+                if(str=="face")
+                    arquivo >> numeroFaces;
+                else
+                {
+                    if(str=="end_header")
+                        leArquivo = false;
+                }
+            }
+
+        }
+    }
+
+
+
+    for(int  i = 0; i<numeroVertices; i ++)
+    {
+        vertice v;
+        float ignorar;
+        arquivo >> v.x;
+        arquivo >> v.y;
+        arquivo >> v.z;
+        for(int j=0; j<numeroPropriedades-3;j++)
+            arquivo >> ignorar;
+         if(v.y>maiorY)
+            maiorY = v.y;
+         if(v.y<menorY)
+            menorY = v.y;
+         if(v.x>maiorX)
+            maiorX = v.x;
+         if(v.x<menorX)
+            menorX = v.x;
+         if(v.z>maiorZ)
+            maiorZ = v.z;
+
+        verticesImg.push_back(v);
+    }
+
+    for(int  i = 0; i<numeroFaces; i ++)
+    {
+        face f;
+        arquivo >> f.nVertices;
+        if(f.nVertices == 3)
+        obj.nTriang++;
+        for(int j=0; j<f.nVertices; j++)
+        {
+            int indice;
+            arquivo >> indice;
+            f.verticesFace.push_back(verticesImg[indice]);
+        }
+       // CalculaNormal(f, &f.vetorNormal);
+
+        facesImg.push_back(f);
+    }
+
+
+    obj.posY = maiorY - abs(menorY-maiorY) ;
+    obj.posX = maiorX - abs(menorX-maiorX)/2;
+    obj.zdist = abs(maiorY - obj.posY)/tan(3.14/9);
+    obj.facesImg = facesImg;
+    facesImg.clear();
+    verticesImg.clear();
+//    objetos.push_back(obj);
+    numeroPropriedades = -1;
+    menorY = 0;
+    maiorY = 0;
+    maiorZ = 0;
+}
+
+void drawObjectPly()
+{
+
+}
+
+///------------------------------------------------------------D2---------------------------------------------------------------
+///------------------------------------------------------------T2---------------------------------------------------------------
+void KeyboardUp(unsigned char key, int x, int y)
+{
+	g_key[key] = false;
+}
+
+void Timer(int value)
+{
+	float speed = g_translation_speed;
+
+	if(g_key['w'] || g_key['W'])
+	{
+		g_camera.Move(speed, flyMode);
+	}
+	else if(g_key['s'] || g_key['S'])
+	{
+		g_camera.Move(-speed, flyMode);
+	}
+	else if(g_key['a'] || g_key['A'])
+	{
+		g_camera.Strafe(speed);
+	}
+	else if(g_key['d'] || g_key['D'])
+	{
+		g_camera.Strafe(-speed);
+	}
+
+	glutTimerFunc(1, Timer, 0);
+}
+
+void MouseMotion(int x, int y)
+{
+	// This variable is hack to stop glutWarpPointer from triggering an event callback to Mouse(...)
+	// This avoids it being called recursively and hanging up the event loop
+	static bool just_warped = false;
+
+	if(just_warped)
+	{
+		just_warped = false;
+		return;
+	}
+
+	int dx = x - g_viewport_width/2;
+	int dy = y - g_viewport_height/2;
+
+	if(inverseMouse) dy = g_viewport_height/2-y;
+
+	if(dx) g_camera.RotateYaw(g_rotation_speed*dx);
+	if(dy) g_camera.RotatePitch(g_rotation_speed*dy);
+
+	if(!releaseMouse)	glutWarpPointer(g_viewport_width/2, g_viewport_height/2);
+
+	just_warped = true;
+}
+
+void pressKey(int key, int x, int y)
+{
+	switch (key)
+	{
+		case GLUT_KEY_F11 :
+			fullscreen = !fullscreen;
+			(fullscreen) ? glutFullScreen() : glutReshapeWindow(800,600);
+		break;
+	}
+}
+
+void movimentaCamera()
+{
+
+
+
+
+
+
+
+
+}
 
 void desenhaEixos()
 {
@@ -634,7 +918,10 @@ void wallCreator()
     GLUquadricObj *quadric;
     quadric = gluNewQuadric();
     drawObject();
+<<<<<<< HEAD
     drawObjectPly();
+=======
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 }
 
 void scene()
@@ -646,12 +933,30 @@ void scene()
     glViewport(0,0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+<<<<<<< HEAD
     gluPerspective(60.0, (GLfloat) width/(GLfloat) height, 0.01, 200.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     //gluLookAt (olhoX, olhoY, olhoZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     cam.Refresh();
+=======
+    gluPerspective(60.0, (GLfloat) width*0.5f/(GLfloat) height, 0.01, 200.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    //gluLookAt (0.0, 5, 10, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    g_camera.Refresh();
+
+    glPushMatrix();
+    glRotatef( rotationY, 0.0, 1.0, 0.0 );
+    glRotatef( rotationX, 1.0, 0.0, 0.0 );
+
+    //if(grupos[grupoAtual].verticesGrupo1.size()>1)
+    GLUquadricObj *quadric;
+    quadric = gluNewQuadric();
+    drawObject();
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
     glPushMatrix();
     glRotatef( -90.0, 1.0, 0.0, 0.0 );
@@ -665,6 +970,7 @@ void scene()
    // quadric = gluNewQuadric();
 
     glBegin(GL_QUADS);
+<<<<<<< HEAD
     glVertex3f(-30,-30,-1);
     glVertex3f(30,-30,-1);
     glVertex3f(30,30,-1);
@@ -696,10 +1002,49 @@ void scene()
     glVertex3f(-30,30,-1.5);
     glVertex3f(-30,30,-1);
     glEnd();
+=======
+    glVertex3f(-3,-3,-1);
+    glVertex3f(3,-3,-1);
+    glVertex3f(3,3,-1);
+    glVertex3f(-3,3,-1);
+
+    glVertex3f(-3,3,-1.5);
+    glVertex3f(3,3,-1.5);
+    glVertex3f(3,-3,-1.5);
+    glVertex3f(-3,-3,-1.5);
+
+    glColor3b(1,0,0);
+    glVertex3f(-3,3,-1);
+    glVertex3f(-3,3,-1.5);
+    glVertex3f(-3,-3,-1.5);
+    glVertex3f(-3,-3,-1);
+
+    glVertex3f(-3,-3,-1);
+    glVertex3f(-3,-3,-1.5);
+    glVertex3f(3,-3,-1.5);
+    glVertex3f(3,-3,-1);
+
+    glVertex3f(3,-3,-1);
+    glVertex3f(3,-3,-1.5);
+    glVertex3f(3,3,-1.5);
+    glVertex3f(3,3,-1);
+
+    glVertex3f(3,3,-1);
+    glVertex3f(3,3,-1.5);
+    glVertex3f(-3,3,-1.5);
+    glVertex3f(-3,3,-1);
+    glEnd();
+}
+///------------------------------------------------------------T2---------------------------------------------------------------
+
+
+
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
 }
 ///------------------------------------------------------------T2---------------------------------------------------------------
 
+<<<<<<< HEAD
 
 
 
@@ -712,6 +1057,16 @@ Timer();
     else
         wallCreator();
 
+=======
+void display(void)
+{
+
+    if(modoNavegacao)
+        scene();
+    else
+        wallCreator();
+
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
     barraT->setAltura(altura);
 
@@ -754,18 +1109,25 @@ void keyboard (unsigned char key, int x, int y)
         if(esp>0)
         esp-=0.5f;
         break;
+<<<<<<< HEAD
      case 'm':
+=======
+    case 'n':
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
         if(modoNavegacao)
             modoNavegacao = false;
         else
             modoNavegacao = true;
         break;
+<<<<<<< HEAD
      case 'p':
         if(modoPly)
             modoPly = false;
         else
             modoPly = true;
         break;
+=======
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
     }
     g_key[key] = true;
 }
@@ -777,6 +1139,7 @@ void specialKeysPress (int key, int x, int y)
     switch (tolower(key))
     {
     case GLUT_KEY_UP:
+        if(!modoNavegacao)
         altura++;
         olhoY-=0.5;
         break;
@@ -831,6 +1194,7 @@ void specialKeysPress (int key, int x, int y)
 // Motion callback
 void motion(int x, int y )
 {
+<<<<<<< HEAD
 
     if(modoNavegacao)
     {
@@ -844,6 +1208,38 @@ void motion(int x, int y )
         last_y = y;
     }
 
+=======
+    if(modoNavegacao)
+    {
+        rotationX += (float) (y - last_y);
+        rotationY += (float) (x - last_x);
+
+        last_x = x;
+        last_y = y;
+
+    }else
+    {
+        static bool just_warped = false;
+
+        if(just_warped)
+        {
+            just_warped = false;
+            return;
+        }
+
+        int dx = x - width/2;
+        int dy = y - height/2;
+
+        if(inverseMouse) dy = height/2-y;
+
+        if(dx) g_camera.RotateYaw(g_rotation_speed*dx);
+        if(dy) g_camera.RotatePitch(g_rotation_speed*dy);
+
+        if(!releaseMouse)	glutWarpPointer(width/2, height/2);
+
+        just_warped = true;
+    }
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 }
 
 
@@ -894,7 +1290,11 @@ void mouse(int button, int state, int x, int y)
 
     }
 
+<<<<<<< HEAD
     if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && !modoNavegacao )
+=======
+    if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && !modoNavegacao)
+>>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
     {
         if(grupos[grupoAtual].verticesGrupo1.size()>0)
         {
