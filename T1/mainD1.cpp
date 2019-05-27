@@ -12,7 +12,7 @@
 #include "camera.h"
 #include <fstream>
 #define M_PI   3.14159265358979323846264338327950288
-#define diminui -14
+#define diminui -17
 using namespace std;
 
 /// Estruturas iniciais para armazenar vertices
@@ -55,6 +55,7 @@ class objeto
     float material[13], orientacao, orientacaoEmPe=0;
     int nTriang=0;
     float alturaDescida = -11;
+    char tipo;
 };
 
 /// Globals
@@ -70,8 +71,10 @@ float esp=0.5f;
 int ultimaAltura;
 bool apagarTela, telaCheia = false, modoNavegacao = true, modoPly = false;
 int indice=0;
-FILE *arquivo = nullptr;
- Camera cam;
+//FILE *arquivo = nullptr;
+fstream salvarArquivo;
+
+Camera cam;
 
 vertice initialVerticesV1 = {-1.0f, -1.0f,  0.0f};
 vertice initialVerticesV2 = { 1.0f, -1.0f,  0.0f};
@@ -99,7 +102,7 @@ bool  flyMode = false;
 bool	releaseMouse = false;
 
 // Movement settings
-float g_translation_speed = 0.5;
+float g_translation_speed = 0.05;
 float g_rotation_speed = M_PI/180*0.2;
 float initialY = 2; // initial height of the camera (flymode off value)
 
@@ -118,7 +121,12 @@ float maiorX=-1000;
 float menorX=1000;
 float maiorZ=-1000;
 
-
+float Brass[] = {0.329412, 0.223529, 0.027451, 1.000000,0.780392, 0.568627, 0.113725, 1.000000,0.992157, 0.941176, 0.807843, 1.000000,27.897400};
+float Bronze[] = {0.212500, 0.127500, 0.054000, 1.000000,0.714000, 0.428400, 0.181440, 1.000000,0.393548, 0.271906, 0.166721, 1.000000,25.600000};
+float Emerald[] = {0.021500, 0.174500, 0.021500, 0.550000,0.075680, 0.614240, 0.075680, 0.550000,0.633000, 0.727811, 0.633000, 0.550000,76.800003};
+float Copper[] = {0.191250, 0.073500, 0.022500, 1.000000,0.703800, 0.270480, 0.082800, 1.000000,0.256777, 0.137622, 0.086014, 1.000000,12.800000};
+float Pearl[] = {0.250000, 0.207250, 0.207250, 0.922000,1.000000, 0.829000, 0.829000, 0.922000,0.296648, 0.296648, 0.296648, 0.922000,11.264000};
+float Ruby[] = {0.174500, 0.011750, 0.011750, 0.550000,0.614240, 0.041360, 0.041360, 0.550000,0.727811, 0.626959, 0.626959, 0.550000,76.800003};
 
 ///TESTEEEEEEEEEEEEEEEEEEEEEEEE
 
@@ -258,7 +266,8 @@ void leArquivoPly(int x, int y, float ang, char ply)
     objeto obj;
     std::ifstream arquivo;
 
-    switch(ply)
+    obj.tipo = ply;
+    switch(obj.tipo)
     {
         case 'v':
             cout<<"vaca"<<endl;
@@ -397,7 +406,7 @@ void drawObjectPly(int n)
 
       //  glRotatef(90,1,0,0);
         for(int i = 0; i < objetos[n].facesImg.size(); i++)
-        {
+        {   setMaterials(Ruby);
             //CalculaNormalPly(facesImg[i], &vetorNormal);
             glNormal3f(objetos[n].facesImg[i].vetorNormal.x, objetos[n].facesImg[i].vetorNormal.y,objetos[n].facesImg[i].vetorNormal.z);
             if(!wireframe){
@@ -422,6 +431,115 @@ void drawObjectPly(int n)
 }
 
 ///------------------------------------------------------------D2---------------------------------------------------------------
+
+void salvarArquivoFuncao()
+{
+    string nomeArquivo;
+    string conteudoArquivo;
+    fstream arqNovo;
+
+    cout<<"Digite o nome do arquivo(termine o nome com '.txt')"<<endl;
+    cin>>nomeArquivo;
+    arqNovo.open(nomeArquivo, ios::out);
+
+    for(int i = 0; i<grupos.size(); i++)
+    {
+        arqNovo<<"GRUPO "<<i<<endl;
+        for(int j = 0; j<grupos[i].verticesGrupo1.size();j++)
+        {
+            arqNovo<<"VERTICES "<<grupos[i].verticesGrupo1[j].x<<" , "<<grupos[i].verticesGrupo1[j].y<<" , "
+            <<grupos[i].verticesGrupo1[j].z<<" , "<<grupos[i].verticesGrupo1[j].espessura<<endl;
+
+            arqNovo<<"VERTICESPERPENDICULARES "<<grupos[i].verticesPerpendiculares[j].x<<" , "<<grupos[i].verticesPerpendiculares[j].y<<" , "
+            <<grupos[i].verticesPerpendiculares[j].z<<" , "<<grupos[i].verticesPerpendiculares[j].espessura<<endl;
+        }
+
+    }
+
+    for(int i = 0; i<objetos.size(); i++)
+    {
+        arqNovo<<"OBJETO "<<i<<endl;
+        arqNovo<<"tipo: "<<objetos[i].tipo<<endl;
+        arqNovo<<"posY: "<<objetos[i].posY<<endl;
+        arqNovo<<"posX: "<<objetos[i].posX<<endl;
+        arqNovo<<"orientacao: "<<objetos[i].orientacao <<endl;
+    }
+
+}
+
+void carregarArquivoFuncao()
+{
+    string nomeArquivo;
+    string conteudoArquivo;
+    char tipoObjF;
+    fstream arqNovo;
+    int indice;
+    float objX, objY, angulo;
+
+    cout<<"Digite o nome do arquivo que deseja carregar"<<endl;
+    cin>>nomeArquivo;
+    arqNovo.open(nomeArquivo, ios::in);
+
+    objetos.clear();
+    grupos.clear();
+
+    while(!arqNovo.eof())
+    {
+        arqNovo>>conteudoArquivo;
+
+        if(conteudoArquivo=="GRUPO")
+        {
+            arqNovo>>indice;
+            grupo gr;
+            grupos.push_back(gr);
+        }
+
+        if(conteudoArquivo=="VERTICES")
+        {
+            vertice v;
+            arqNovo>> v.x;
+            arqNovo>>conteudoArquivo;
+            arqNovo>> v.y;
+            arqNovo>>conteudoArquivo;
+            arqNovo>> v.z;
+            arqNovo>>conteudoArquivo;
+            arqNovo>> v.espessura;
+
+            grupos[indice].verticesGrupo1.push_back(v);
+        }
+
+         if(conteudoArquivo=="VERTICESPERPENDICULARES")
+        {
+            vertice v;
+            arqNovo>> v.x;
+            arqNovo>>conteudoArquivo;
+            arqNovo>> v.y;
+            arqNovo>>conteudoArquivo;
+            arqNovo>> v.z;
+            arqNovo>>conteudoArquivo;
+            arqNovo>> v.espessura;
+
+            grupos[indice].verticesPerpendiculares.push_back(v);
+        }
+
+        if(conteudoArquivo=="OBJETO")
+        {
+            arqNovo>>conteudoArquivo;
+            arqNovo>>conteudoArquivo;
+            arqNovo>>tipoObjF;
+            arqNovo>>conteudoArquivo;
+            arqNovo>>objY;
+            arqNovo>>conteudoArquivo;
+            arqNovo>>objX;
+            arqNovo>>conteudoArquivo;
+            arqNovo>>angulo;
+
+            leArquivoPly(objX,objY,angulo,tipoObjF);
+        }
+
+    }
+}
+
 void init(void)
 {
     //initLight(width, height); // Função extra para tratar iluminação.
@@ -435,8 +553,7 @@ void init(void)
    // glFrontFace(GL_CW);
     // glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
     // glDisable(GL_CULL_FACE);
-    setMaterials();
-
+    setMaterials(Brass);
     // Cor da fonte de luz (RGBA)
     GLfloat cor_luz[]     = { 1.0, 1.0, 1.0, 1.0};
     // Posicao da fonte de luz. Ultimo parametro define se a luz sera direcional (0.0) ou tera uma posicional (1.0)
@@ -448,16 +565,32 @@ void init(void)
     glLightfv(GL_LIGHT0, GL_SPECULAR, cor_luz);
     glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
 
-    cam.SetPos(0,-13,0);
+    cam.SetPos(0,-15,0);
 
     grupos.push_back(gr);
     ifstream arqPly;
+ //   salvarArquivoFuncao();
     /*arqPly.open("snowman.ply");
     arquivoPly.open("ant.ply");
     leArquivoPly( 0,0,90,'f');
     leArquivoPly(arquivoPly, 0,2,90,'v');*/
 
+
+    cout<<"SISTEMA DE NAVEGACAO"<<endl;
+    cout<<"Para ativar/desativar o modo de criacao de paredes, pressione a tecla 'm'"<<endl;
+    cout<<"Para adicionar um objeto ply, pressione, no modo de criacao de paredes, a tecla 'p'"<<endl;
+    cout<<"Para aumentar a espessura da sua parede, pressione a tecla '.'"<<endl;
+    cout<<"Para diminuir a espessura da sua parede, pressione a tecla ','"<<endl;
+    cout<<"Para aumentar a altura da sua parede, pressione a tecla 'para cima'"<<endl;
+    cout<<"Para diminuir a altura da sua parede, pressione a tecla 'para baixo'"<<endl;
+    cout<<"Para ativar/desativar o modo tela cheia, pressione a tecla 'F12'"<<endl;
+    cout<<"Para salvar o cenário gerado, pressione a tecla 's'"<<endl;
+    cout<<"Para carregar um cenário já gerado, pressione a tecla 'l'"<<endl;
+    cout<<"Para mover a câmera, tanto no modo navegação quanto no de criação de mapa, clique na tela e arraste o mouse"<<endl;
+
 }
+
+
 
 vertice calculaPerpendicular(vertice v1, vertice v2, float h){
 
@@ -610,7 +743,7 @@ void drawObject()
 
                 }
 
-
+cout<<grupos[0].verticesGrupo1.size()<< " e "<<grupos[0].verticesPerpendiculares.size()<<endl;
 
               /*  triangle t[2] = {{ v[0], v[1],v[2]},
                     {v[1], v[3],v[2] }
@@ -721,6 +854,7 @@ void desenho2D()
 
         if(!objetos.empty())
         {
+            glColor3b(1.0,0.0,0.0);
             for(int i = 0; i<objetos.size(); i++)
                 glVertex2d(objetos[i].posX, objetos[i].posY);
         }
@@ -764,7 +898,7 @@ void wallCreator()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt (0.0, 0.0, zdist*7, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
     glPushMatrix();
     glRotatef( rotationY, 0.0, 1.0, 0.0 );
@@ -904,11 +1038,11 @@ void keyboard (unsigned char key, int x, int y)
     switch (key)
     {
     case '.':
-        esp+=0.5f;
+        altura++;
         break;
     case ',':
         if(esp>0)
-        esp-=0.5f;
+        altura--;
         break;
      case 'm':
         if(modoNavegacao)
@@ -917,6 +1051,7 @@ void keyboard (unsigned char key, int x, int y)
             modoNavegacao = true;
         break;
      case 'p':
+        if(!modoNavegacao)
         if(modoPly)
             modoPly = false;
         else
@@ -933,7 +1068,14 @@ void keyboard (unsigned char key, int x, int y)
             cout<<"Agora clique na tela para decidir a localizacao do objeto"<<endl;
             modoPly = true;
         }
-
+        break;
+     case 's':
+        if(!modoNavegacao)
+       salvarArquivoFuncao();
+        break;
+     case 'l':
+        if(!modoNavegacao)
+       carregarArquivoFuncao();
         break;
     }
     g_key[key] = true;
@@ -946,13 +1088,11 @@ void specialKeysPress (int key, int x, int y)
     switch (tolower(key))
     {
     case GLUT_KEY_UP:
-        altura++;
-        olhoY-=2.5;
+        esp+=0.5f;
         break;
     case GLUT_KEY_DOWN:
-        if(altura>0)
-        altura--;
-        olhoY+=2.5;
+        if(esp>0)
+        esp-=0.5f;
         break;
     case GLUT_KEY_RIGHT:
 
