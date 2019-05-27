@@ -4,23 +4,15 @@
 #include <ctype.h>
 #include <math.h>
 #include <iostream>
-//#include "extras.h"
+#include "extras.h"
 #include <vector>
-//#include "Titulo.h"
+#include "Titulo.h"
 #include <cmath>
-<<<<<<< HEAD
 #include "extrasD1.h"
 #include "camera.h"
 #include <fstream>
 #define M_PI   3.14159265358979323846264338327950288
-=======
-#include <fstream>
-#include "extras.h"
-#include "camera.h"
-#include "Titulo.h"
-
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
-
+#define diminui -14
 using namespace std;
 
 /// Estruturas iniciais para armazenar vertices
@@ -36,24 +28,6 @@ class triangle
 {
 public:
     vertice v[3];
-};
-
-class face
-{
-public:
-    int nVertices;
-    std::vector<vertice> verticesFace;
-    vertice vetorNormal;
-};
-
-class objeto
-{
-public:
-    float posY, posX;
-    float zdist;
-    std::vector<face> facesImg;
-    float material[13];
-    int nTriang=0;
 };
 
 class grupo
@@ -76,15 +50,17 @@ class objeto
 {
     public:
     float posY, posX;
-    float zdist;
+    float zdist, escala;
     std::vector<face> facesImg;
-    float material[13];
+    float material[13], orientacao, orientacaoEmPe=0;
     int nTriang=0;
+    float alturaDescida = -11;
 };
 
 /// Globals
 float zdist = 5.0, olhoY = 5, olhoX = 0, olhoZ = 10;
-float rotationX = 272, rotationY = 0.0, posZ, posY;
+float rotationX = 272, rotationY = 0.0, posZ, posY, novoAng;
+char ply;
 int   last_x, last_y;
 int   width, height;
 int numeroPontos = 0;
@@ -92,49 +68,10 @@ int grupoAtual=0;
 int altura=1;
 float esp=0.5f;
 int ultimaAltura;
-bool apagarTela, telaCheia = false, modoNavegacao = true, modoPly = true;
+bool apagarTela, telaCheia = false, modoNavegacao = true, modoPly = false;
 int indice=0;
-<<<<<<< HEAD
 FILE *arquivo = nullptr;
  Camera cam;
-=======
-
-ifstream arquivoPly;
-std::string str;
-int numeroVertices;
-int numeroFaces;
-int numeroPropriedades = -1;
-std::vector<vertice> verticesImg;
-std::vector<face> facesImg;
-bool wireframe = false;
-float maiorY=-1000;
-float menorY=10000;
-float maiorX=-1000;
-float menorX=1000;
-float maiorZ=-1000;
-
-bool modoNavegacao = false;
-
-float posCamX, posCamZ;
-
-Camera g_camera;
-bool 	g_key[256];
-bool 	g_shift_down = false;
-int 	g_viewport_width = 0;
-int 	g_viewport_height = 0;
-bool 	g_mouse_left_down = false;
-bool	g_mouse_right_down = false;
-bool	fullscreen = false;	// Fullscreen Flag Set To Fullscreen Mode By Default
-bool 	inverseMouse = false;
-bool	boostSpeed = false; // Change keyboard speed
-bool  flyMode = false;
-bool	releaseMouse = false;
-
-// Movement settings
-float g_translation_speed = 0.05;
-float g_rotation_speed = M_PI/180*0.2;
-float initialY = 2; // initial height of the camera (flymode off value)
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
 vertice initialVerticesV1 = {-1.0f, -1.0f,  0.0f};
 vertice initialVerticesV2 = { 1.0f, -1.0f,  0.0f};
@@ -147,7 +84,6 @@ vertice lastVertice2 = initialVerticesV2;
 std::vector<vertice> vert;
 std::vector<triangle> triang;
 std::vector<grupo> grupos;
-
 
 grupo gr;
 bool 	g_key[256];
@@ -163,7 +99,7 @@ bool  flyMode = false;
 bool	releaseMouse = false;
 
 // Movement settings
-float g_translation_speed = 0.05;
+float g_translation_speed = 0.5;
 float g_rotation_speed = M_PI/180*0.2;
 float initialY = 2; // initial height of the camera (flymode off value)
 
@@ -188,45 +124,7 @@ float maiorZ=-1000;
 
 
 /// Functions
-<<<<<<< HEAD
 Titulo *barraT = new Titulo((char*)"ALTURA: ", (char*)" GRUPO", altura, grupoAtual);
-=======
-Titulo *barraT = new Titulo((char*)"ALTURA: ", (char*)" GRUPO", altura);
-
-void init(void)
-{
-    posCamX = 0;
-    posCamZ = 0;
-    //initLight(width, height); // Função extra para tratar iluminação.
-    g_camera.SetPos(posCamX,0,posCamZ);
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);                 // Habilita luz
-    glEnable(GL_LIGHT0);
-    glEnable(GL_CULL_FACE);
-   // glFrontFace(GL_CW);
-    // glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
-    // glDisable(GL_CULL_FACE);
-
-    // Cor da fonte de luz (RGBA)
-    GLfloat cor_luz[]     = { 1.0, 1.0, 1.0, 1.0};
-    // Posicao da fonte de luz. Ultimo parametro define se a luz sera direcional (0.0) ou tera uma posicional (1.0)
-    GLfloat posicao_luz[] = { 50.0, 50.0, 50.0, 1.0};
-
-    // Define parametros da luz
-    glLightfv(GL_LIGHT0, GL_AMBIENT, cor_luz);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, cor_luz);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, cor_luz);
-    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
-
-    setMaterial();
-
-    grupos.push_back(gr);
-
-
-}
-
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 /* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do triângulo;
   v_2
   ^
@@ -268,7 +166,6 @@ void CalculaNormal(triangle t, vertice *vn)
     vn->z /= len;
 }
 
-<<<<<<< HEAD
 void CalculaNormalPly(face t, vertice *vn)
 {
     vertice v_0 = t.verticesFace[0],
@@ -354,19 +251,60 @@ void MouseMotion(int x, int y)
 }
 ///------------------------------------------------MOVIMENTO DO MOUSE----------------------------------------------
 ///------------------------------------------------------------D2---------------------------------------------------------------
-vertice rotacionaEmRelacao(vertice v, vertice menorY)
-{
-    float aux;
-        aux = abs(v.x - menorY.x);
-        v.x -= abs(aux);
-        v.z -= abs(aux);
 
-        return v;
-}
-void leArquivoPly(std::ifstream& arquivo, int x, int y)
+void leArquivoPly(int x, int y, float ang, char ply)
 {
-cout<<"ler"<<endl;
+
     objeto obj;
+    std::ifstream arquivo;
+
+    switch(ply)
+    {
+        case 'v':
+            cout<<"vaca"<<endl;
+            obj.orientacaoEmPe = 0;
+            obj.escala = 2.5;
+            obj.alturaDescida = -17;
+            arquivo.open("cow.ply");
+        break;
+        case 'V':
+            cout<<"vaca"<<endl;
+            obj.orientacaoEmPe = 0;
+            obj.escala = 2.5;
+            obj.alturaDescida = -17;
+            arquivo.open("cow.ply");
+
+        break;
+        case 'f':
+            cout<<"formiga"<<endl;
+            obj.orientacaoEmPe = 0;
+            obj.escala = 0.1;
+            obj.alturaDescida = -16;
+            arquivo.open("ant.ply");
+        break;
+        case 'F':
+            cout<<"formiga"<<endl;
+            obj.orientacaoEmPe = 0;
+            obj.escala = 0.1;
+            obj.alturaDescida = -16;
+            arquivo.open("ant.ply");
+        break;
+        case 'b':
+            cout<<"boneco de neve"<<endl;
+            obj.orientacaoEmPe = -90;
+            obj.escala = 1;
+            obj.alturaDescida = -16;
+            arquivo.open("snowman.ply");
+        break;
+        case 'B':
+            cout<<"boneco de neve"<<endl;
+            obj.orientacaoEmPe = -90;
+             obj.escala = 1;
+            obj.alturaDescida = -16;
+             arquivo.open("snowman.ply");
+        break;
+    }
+
     bool leArquivo=true;
 
 
@@ -394,7 +332,7 @@ cout<<"ler"<<endl;
         }
     }
 
-vertice vRot;
+
 
     for(int  i = 0; i<numeroVertices; i ++)
     {
@@ -404,18 +342,12 @@ vertice vRot;
         arquivo >> v.y;
         arquivo >> v.z;
 
-        v.x += x;
-        v.y += y;
-
         for(int j=0; j<numeroPropriedades-3;j++)
             arquivo >> ignorar;
          if(v.y>maiorY)
             maiorY = v.y;
          if(v.y<menorY)
-         {
-             vRot = v;
-             menorY = v.y;
-         }
+            menorY = v.y;
          if(v.x>maiorX)
             maiorX = v.x;
          if(v.x<menorX)
@@ -425,11 +357,6 @@ vertice vRot;
 
         verticesImg.push_back(v);
     }
-
-    /*for(int  i = 0; i<numeroVertices; i ++)
-    {
-        verticesImg[i] = rotacionaEmRelacao(verticesImg[i], vRot);
-    }*/
 
     for(int  i = 0; i<numeroFaces; i ++)
     {
@@ -448,12 +375,12 @@ vertice vRot;
         obj.facesImg.push_back(f);
     }
     cout<<obj.facesImg.size()<<endl;
-    objetos.push_back(obj);
 
-
-    obj.posY = maiorY - abs(menorY-maiorY) ;
-    obj.posX = maiorX - abs(menorX-maiorX)/2;
+    obj.posY = y;
+    obj.posX = x;
+    obj.orientacao = ang;
     cout<<obj.posX<<" e "<<obj.posY<<endl;
+    objetos.push_back(obj);
     obj.zdist = abs(maiorY - obj.posY)/tan(3.14/9);
     obj.facesImg = facesImg;
     facesImg.clear();
@@ -464,27 +391,22 @@ vertice vRot;
     maiorZ = 0;
 }
 
-void drawObjectPly()
+void drawObjectPly(int n)
 {
-    //cout<<objetos.size()<<endl;
-   // cout<<objetos[0].facesImg.size()<<endl;
-    for(int n = 0; n< objetos.size(); n++)
-    {   //cout<<objetos[n].facesImg.size()<<endl;
+
+
+      //  glRotatef(90,1,0,0);
         for(int i = 0; i < objetos[n].facesImg.size(); i++)
         {
             //CalculaNormalPly(facesImg[i], &vetorNormal);
             glNormal3f(objetos[n].facesImg[i].vetorNormal.x, objetos[n].facesImg[i].vetorNormal.y,objetos[n].facesImg[i].vetorNormal.z);
-
             if(!wireframe){
-           // glPushMatrix();
-           // glRotatef(90,1.0,0.0,0.0);
             glBegin(GL_POLYGON);
             for(int j=0; j < objetos[n].facesImg[i].nVertices; j++)
             {
                 glVertex3d(objetos[n].facesImg[i].verticesFace[j].x,objetos[n].facesImg[i].verticesFace[j].y,objetos[n].facesImg[i].verticesFace[j].z);
             }
-             glEnd();
-            // glPopMatrix();
+            glEnd();
             }else{
 
             glBegin(GL_LINE_STRIP);
@@ -495,10 +417,8 @@ void drawObjectPly()
             glEnd();
 
             }
-            // glPopMatrix();
-
         }
-    }
+
 }
 
 ///------------------------------------------------------------D2---------------------------------------------------------------
@@ -511,6 +431,7 @@ void init(void)
     glEnable(GL_LIGHTING);                 // Habilita luz
     glEnable(GL_LIGHT0);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_NORMALIZE);
    // glFrontFace(GL_CW);
     // glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
     // glDisable(GL_CULL_FACE);
@@ -527,15 +448,16 @@ void init(void)
     glLightfv(GL_LIGHT0, GL_SPECULAR, cor_luz);
     glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
 
-    grupos.push_back(gr);
+    cam.SetPos(0,-13,0);
 
-    arquivoPly.open("cow.ply");
-    leArquivoPly(arquivoPly, 20,3);
+    grupos.push_back(gr);
+    ifstream arqPly;
+    /*arqPly.open("snowman.ply");
+    arquivoPly.open("ant.ply");
+    leArquivoPly( 0,0,90,'f');
+    leArquivoPly(arquivoPly, 0,2,90,'v');*/
 
 }
-=======
-///-------------------------------------------------------------T1-------------------------------------------------------------
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
 vertice calculaPerpendicular(vertice v1, vertice v2, float h){
 
@@ -567,46 +489,153 @@ void drawObject()
             {
 
                 vertice v[4] = {
-                {grupos[j].verticesGrupo1[i].z+grupos[j].verticesPerpendiculares[i].x*grupos[j].verticesGrupo1[i].x,  grupos[j].verticesGrupo1[i].y+grupos[j].verticesPerpendiculares[i].y, -1},
-                {grupos[j].verticesGrupo1[i].z-grupos[j].verticesPerpendiculares[i].x*grupos[j].verticesGrupo1[i].x,  grupos[j].verticesGrupo1[i].y-grupos[j].verticesPerpendiculares[i].y, -1},
-                {grupos[j].verticesGrupo1[i+1].z+grupos[j].verticesPerpendiculares[i+1].x*grupos[j].verticesGrupo1[i+1].x,  grupos[j].verticesGrupo1[i+1].y+grupos[j].verticesPerpendiculares[i+1].y, -1},
-                {grupos[j].verticesGrupo1[i+1].z-grupos[j].verticesPerpendiculares[i+1].x*grupos[j].verticesGrupo1[i+1].x,  grupos[j].verticesGrupo1[i+1].y-grupos[j].verticesPerpendiculares[i+1].y, -1}
+                {grupos[j].verticesGrupo1[i].z+grupos[j].verticesPerpendiculares[i].x*grupos[j].verticesGrupo1[i].x,  diminui, grupos[j].verticesGrupo1[i].y+grupos[j].verticesPerpendiculares[i].y},
+                {grupos[j].verticesGrupo1[i].z-grupos[j].verticesPerpendiculares[i].x*grupos[j].verticesGrupo1[i].x,  diminui, grupos[j].verticesGrupo1[i].y-grupos[j].verticesPerpendiculares[i].y},
+                {grupos[j].verticesGrupo1[i+1].z+grupos[j].verticesPerpendiculares[i+1].x*grupos[j].verticesGrupo1[i+1].x, diminui , grupos[j].verticesGrupo1[i+1].y+grupos[j].verticesPerpendiculares[i+1].y},
+                {grupos[j].verticesGrupo1[i+1].z-grupos[j].verticesPerpendiculares[i+1].x*grupos[j].verticesGrupo1[i+1].x, diminui,grupos[j].verticesGrupo1[i+1].y-grupos[j].verticesPerpendiculares[i+1].y}
                                };
                  vertice v2[4] = {
-                {grupos[j].verticesGrupo1[i].z+grupos[j].verticesPerpendiculares[i].x*grupos[j].verticesGrupo1[i].x,  grupos[j].verticesGrupo1[i].y+grupos[j].verticesPerpendiculares[i].y,grupos[j].verticesGrupo1[i].espessura-1},
-                {grupos[j].verticesGrupo1[i].z-grupos[j].verticesPerpendiculares[i].x*grupos[j].verticesGrupo1[i].x,  grupos[j].verticesGrupo1[i].y-grupos[j].verticesPerpendiculares[i].y,grupos[j].verticesGrupo1[i].espessura-1},
-                {grupos[j].verticesGrupo1[i+1].z+grupos[j].verticesPerpendiculares[i+1].x*grupos[j].verticesGrupo1[i+1].x,  grupos[j].verticesGrupo1[i+1].y+grupos[j].verticesPerpendiculares[i+1].y,grupos[j].verticesGrupo1[i+1].espessura-1},
-                {grupos[j].verticesGrupo1[i+1].z-grupos[j].verticesPerpendiculares[i+1].x*grupos[j].verticesGrupo1[i+1].x,  grupos[j].verticesGrupo1[i+1].y-grupos[j].verticesPerpendiculares[i+1].y,grupos[j].verticesGrupo1[i+1].espessura-1}
+                {grupos[j].verticesGrupo1[i].z+grupos[j].verticesPerpendiculares[i].x*grupos[j].verticesGrupo1[i].x,  grupos[j].verticesGrupo1[i].espessura+diminui,grupos[j].verticesGrupo1[i].y+grupos[j].verticesPerpendiculares[i].y},
+                {grupos[j].verticesGrupo1[i].z-grupos[j].verticesPerpendiculares[i].x*grupos[j].verticesGrupo1[i].x,  grupos[j].verticesGrupo1[i].espessura+diminui, grupos[j].verticesGrupo1[i].y-grupos[j].verticesPerpendiculares[i].y},
+                {grupos[j].verticesGrupo1[i+1].z+grupos[j].verticesPerpendiculares[i+1].x*grupos[j].verticesGrupo1[i+1].x,  grupos[j].verticesGrupo1[i+1].espessura+diminui,grupos[j].verticesGrupo1[i+1].y+grupos[j].verticesPerpendiculares[i+1].y},
+                {grupos[j].verticesGrupo1[i+1].z-grupos[j].verticesPerpendiculares[i+1].x*grupos[j].verticesGrupo1[i+1].x,  grupos[j].verticesGrupo1[i+1].espessura+diminui,grupos[j].verticesGrupo1[i+1].y-grupos[j].verticesPerpendiculares[i+1].y}
                                };
 
-                triangle t[2] = {{ v[2], v[1],v[0]},
+
+                /*triangle t[2] = {{ v[2], v[1],v[0]},
                     {v[2] , v[3],v[1]}
+                };*/
+
+                triangle t[2],t2[2],t3[2],t4[2],t5[2],t6[2];
+
+
+                if(grupos[j].verticesGrupo1[i+1].y > grupos[j].verticesGrupo1[i].y )
+                {
+                    t[0].v[0] = v[2];
+                    t[0].v[1] = v[1];
+                    t[0].v[2] = v[0];
+
+                    t[1].v[0] = v[2];
+                    t[1].v[1] = v[3];
+                    t[1].v[2] = v[1];
+
+                    t2[0].v[0] = v2[0];
+                    t2[0].v[1] = v2[1];
+                    t2[0].v[2] = v2[2];
+
+                    t2[1].v[0] = v2[1];
+                    t2[1].v[1] = v2[3];
+                    t2[1].v[2] = v2[2];
+
+                    t3[0].v[0] = v[0];
+                    t3[0].v[1] = v2[0];
+                    t3[0].v[2] = v2[2];
+
+                    t3[1].v[0] = v2[2];
+                    t3[1].v[1] = v[2];
+                    t3[1].v[2] = v[0];
+
+                    t4[0].v[0] = v2[3];
+                    t4[0].v[1] = v2[1];
+                    t4[0].v[2] = v[1];
+
+                    t4[1].v[0] = v[1];
+                    t4[1].v[1] = v[3];
+                    t4[1].v[2] = v2[3];
+
+                    t5[0].v[0] = v2[1];
+                    t5[0].v[1] = v2[0];
+                    t5[0].v[2] = v[0];
+
+                    t5[1].v[0] = v[0];
+                    t5[1].v[1] = v[1];
+                    t5[1].v[2] = v2[1];
+
+                    t6[0].v[0] = v[2];
+                    t6[0].v[1] = v2[2];
+                    t6[0].v[2] = v2[3];
+
+                    t6[1].v[0] = v2[3];
+                    t6[1].v[1] = v[3];
+                    t6[1].v[2] = v[2];
+                }else
+                {
+                    t[0].v[0] =v[0];
+                    t[0].v[1] = v[1];
+                    t[0].v[2] =  v[2];
+
+                    t[1].v[0] = v[1];
+                    t[1].v[1] = v[3];
+                    t[1].v[2] = v[2];
+
+                    t2[0].v[0] = v2[2];
+                    t2[0].v[1] = v2[1];
+                    t2[0].v[2] = v2[0];
+
+                    t2[1].v[0] = v2[2];
+                    t2[1].v[1] = v2[3];
+                    t2[1].v[2] = v2[1];
+
+                    t3[0].v[0] = v2[2];
+                    t3[0].v[1] = v2[0];
+                    t3[0].v[2] = v[0];
+
+                    t3[1].v[0] = v[0];
+                    t3[1].v[1] = v[2];
+                    t3[1].v[2] = v2[2];
+
+                    t4[0].v[0] = v[1];
+                    t4[0].v[1] = v2[1];
+                    t4[0].v[2] = v2[3];
+
+                    t4[1].v[0] = v2[3];
+                    t4[1].v[1] = v[3];
+                    t4[1].v[2] = v[1];
+
+                    t5[0].v[0] = v[0];
+                    t5[0].v[1] = v2[0];
+                    t5[0].v[2] = v2[1];
+
+                    t5[1].v[0] = v2[1];
+                    t5[1].v[1] = v[1];
+                    t5[1].v[2] = v[0];
+
+                    t6[0].v[0] = v2[3];
+                    t6[0].v[1] = v2[2];
+                    t6[0].v[2] = v[2];
+
+                    t6[1].v[0] = v[2];
+                    t6[1].v[1] = v[3];
+                    t6[1].v[2] = v2[3];
+
+                }
+
+
+
+              /*  triangle t[2] = {{ v[0], v[1],v[2]},
+                    {v[1], v[3],v[2] }
                 };
 
-                 triangle t2[2] = {{ v2[0], v2[1],v2[2]},
-                    {v2[1], v2[3],v2[2] }
+                 triangle t2[2] = {{ v2[2], v2[1],v2[0]},
+                    {v2[2] , v2[3],v2[1]}
                 };
 
-                 triangle t3[2] = {{ v[0], v2[0],v2[2]},
-                    {v2[2] , v[2],v[0]}
+                 triangle t3[2] = {{ v2[2], v2[0],v[0]},
+                    {v[0] , v[2],v2[2]}
                 };
 
-                  triangle t4[2] = {{v2[3], v2[1],v[1] },
-                    {v[1], v[3], v2[3]}
+                  triangle t4[2] = {{v[1], v2[1],v2[3] },
+                    {v2[3], v[3], v[1]}
                 };
 
-                   triangle t5[2] = {{v2[1], v2[0],v[0]},
-                    {v[0], v[1], v2[1]}
+                   triangle t5[2] = {{v[0], v2[0],v2[1]},
+                    {v2[1], v[1],v[0] }
                 };
 
-                 triangle t6[2] = { {v[2], v2[2], v2[3]},
-                    {v2[3], v[3],v[2]}
+                 triangle t6[2] = { { v2[3], v2[2],v[2]},
+                    {v[2], v[3],v2[3]}
                 };
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
+*/
                 glBegin(GL_TRIANGLES);
                 for(int i = 0; i < 2; i++) // triangulos
                 {
@@ -660,178 +689,6 @@ void drawObject()
 
 }
 
-///------------------------------------------------------------T1---------------------------------------------------------------
-///------------------------------------------------------------D2---------------------------------------------------------------
-
-void leArquivoPly(std::ifstream& arquivo)
-{
-
-    objeto obj;
-    bool leArquivo=true;
-
-    while(leArquivo)
-    {
-        arquivo >> str;
-        if(str=="property")
-            numeroPropriedades++;
-        else
-        {
-
-            if(str=="vertex")
-                arquivo >> numeroVertices;
-            else
-            {
-                if(str=="face")
-                    arquivo >> numeroFaces;
-                else
-                {
-                    if(str=="end_header")
-                        leArquivo = false;
-                }
-            }
-
-        }
-    }
-
-
-
-    for(int  i = 0; i<numeroVertices; i ++)
-    {
-        vertice v;
-        float ignorar;
-        arquivo >> v.x;
-        arquivo >> v.y;
-        arquivo >> v.z;
-        for(int j=0; j<numeroPropriedades-3;j++)
-            arquivo >> ignorar;
-         if(v.y>maiorY)
-            maiorY = v.y;
-         if(v.y<menorY)
-            menorY = v.y;
-         if(v.x>maiorX)
-            maiorX = v.x;
-         if(v.x<menorX)
-            menorX = v.x;
-         if(v.z>maiorZ)
-            maiorZ = v.z;
-
-        verticesImg.push_back(v);
-    }
-
-    for(int  i = 0; i<numeroFaces; i ++)
-    {
-        face f;
-        arquivo >> f.nVertices;
-        if(f.nVertices == 3)
-        obj.nTriang++;
-        for(int j=0; j<f.nVertices; j++)
-        {
-            int indice;
-            arquivo >> indice;
-            f.verticesFace.push_back(verticesImg[indice]);
-        }
-       // CalculaNormal(f, &f.vetorNormal);
-
-        facesImg.push_back(f);
-    }
-
-
-    obj.posY = maiorY - abs(menorY-maiorY) ;
-    obj.posX = maiorX - abs(menorX-maiorX)/2;
-    obj.zdist = abs(maiorY - obj.posY)/tan(3.14/9);
-    obj.facesImg = facesImg;
-    facesImg.clear();
-    verticesImg.clear();
-//    objetos.push_back(obj);
-    numeroPropriedades = -1;
-    menorY = 0;
-    maiorY = 0;
-    maiorZ = 0;
-}
-
-void drawObjectPly()
-{
-
-}
-
-///------------------------------------------------------------D2---------------------------------------------------------------
-///------------------------------------------------------------T2---------------------------------------------------------------
-void KeyboardUp(unsigned char key, int x, int y)
-{
-	g_key[key] = false;
-}
-
-void Timer(int value)
-{
-	float speed = g_translation_speed;
-
-	if(g_key['w'] || g_key['W'])
-	{
-		g_camera.Move(speed, flyMode);
-	}
-	else if(g_key['s'] || g_key['S'])
-	{
-		g_camera.Move(-speed, flyMode);
-	}
-	else if(g_key['a'] || g_key['A'])
-	{
-		g_camera.Strafe(speed);
-	}
-	else if(g_key['d'] || g_key['D'])
-	{
-		g_camera.Strafe(-speed);
-	}
-
-	glutTimerFunc(1, Timer, 0);
-}
-
-void MouseMotion(int x, int y)
-{
-	// This variable is hack to stop glutWarpPointer from triggering an event callback to Mouse(...)
-	// This avoids it being called recursively and hanging up the event loop
-	static bool just_warped = false;
-
-	if(just_warped)
-	{
-		just_warped = false;
-		return;
-	}
-
-	int dx = x - g_viewport_width/2;
-	int dy = y - g_viewport_height/2;
-
-	if(inverseMouse) dy = g_viewport_height/2-y;
-
-	if(dx) g_camera.RotateYaw(g_rotation_speed*dx);
-	if(dy) g_camera.RotatePitch(g_rotation_speed*dy);
-
-	if(!releaseMouse)	glutWarpPointer(g_viewport_width/2, g_viewport_height/2);
-
-	just_warped = true;
-}
-
-void pressKey(int key, int x, int y)
-{
-	switch (key)
-	{
-		case GLUT_KEY_F11 :
-			fullscreen = !fullscreen;
-			(fullscreen) ? glutFullScreen() : glutReshapeWindow(800,600);
-		break;
-	}
-}
-
-void movimentaCamera()
-{
-
-
-
-
-
-
-
-
-}
 
 void desenhaEixos()
 {
@@ -865,7 +722,7 @@ void desenho2D()
         if(!objetos.empty())
         {
             for(int i = 0; i<objetos.size(); i++)
-                glVertex2d(objetos[i].facesImg[0].verticesFace[0].x, objetos[i].facesImg[0].verticesFace[0].y);
+                glVertex2d(objetos[i].posX, objetos[i].posY);
         }
 
     }
@@ -918,10 +775,20 @@ void wallCreator()
     GLUquadricObj *quadric;
     quadric = gluNewQuadric();
     drawObject();
-<<<<<<< HEAD
-    drawObjectPly();
-=======
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
+    for(int n = 0; n< objetos.size(); n++)
+    {
+         glPushMatrix();
+            //glRotated(90, 0.0,1.0,0.0);
+            //cout<<objetos[n].facesImg[0].vetorNormal.x<<endl;
+          //  glTranslated(objetos[n].posX,objetos[n].alturaDescida,objetos[n].posY);
+            //glTranslated(objetos[n].posX,objetos[n].alturaDescida,objetos[n].posY);
+            glScalef(objetos[n].escala,objetos[n].escala,objetos[n].escala);
+            glRotatef(objetos[n].orientacao,0.0,1.0,0.0);
+            glRotatef(objetos[n].orientacaoEmPe,1.0,0.0,0.0);
+            drawObjectPly(n);
+            glPopMatrix();
+    }
+    glPopMatrix();
 }
 
 void scene()
@@ -933,118 +800,62 @@ void scene()
     glViewport(0,0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-<<<<<<< HEAD
     gluPerspective(60.0, (GLfloat) width/(GLfloat) height, 0.01, 200.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     //gluLookAt (olhoX, olhoY, olhoZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    cam.Refresh();
-=======
-    gluPerspective(60.0, (GLfloat) width*0.5f/(GLfloat) height, 0.01, 200.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    //gluLookAt (0.0, 5, 10, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    g_camera.Refresh();
+     cam.Refresh();
 
     glPushMatrix();
-    glRotatef( rotationY, 0.0, 1.0, 0.0 );
-    glRotatef( rotationX, 1.0, 0.0, 0.0 );
+    //glRotatef( -90.0, 1.0, 0.0, 0.0 );
+   // glRotatef( rotationX, 0.0, 0.0, 1.0 );
 
     //if(grupos[grupoAtual].verticesGrupo1.size()>1)
-    GLUquadricObj *quadric;
-    quadric = gluNewQuadric();
-    drawObject();
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
-    glPushMatrix();
-    glRotatef( -90.0, 1.0, 0.0, 0.0 );
-    glRotatef( rotationX, 0.0, 0.0, 1.0 );
+   // glPushMatrix();
+   // glRotatef( -180.0, 1.0, 0.0, 0.0 );
+   // glRotatef(90,1.0,0.0,0.0);
 
-    //if(grupos[grupoAtual].verticesGrupo1.size()>1)
-    GLUquadricObj *quadric;
-    quadric = gluNewQuadric();
-    drawObject();
-    drawObjectPly();
+   // glPopMatrix();
    // quadric = gluNewQuadric();
+    glPushMatrix();
+  // glTranslatef(0,0,-5);
+   glTranslatef(0,-20,0);
+   glPushMatrix();
+   glScalef(1,0.1,1);
+   glutSolidCube(60);
+   glPopMatrix();
+   glPopMatrix();
 
-    glBegin(GL_QUADS);
-<<<<<<< HEAD
-    glVertex3f(-30,-30,-1);
-    glVertex3f(30,-30,-1);
-    glVertex3f(30,30,-1);
-    glVertex3f(-30,30,-1);
+   glPushMatrix();
 
-    glVertex3f(-30,30,-1.5);
-    glVertex3f(30,30,-1.5);
-    glVertex3f(30,-30,-1.5);
-    glVertex3f(-30,-30,-1.5);
+    GLUquadricObj *quadric;
+    quadric = gluNewQuadric();
+    glPushMatrix();
+  //  glTranslatef(0,-11,0);
+ //   glRotatef(-90,1.0,0.0,0.0);
 
-    glColor3b(1,0,0);
-    glVertex3f(-30,30,-1);
-    glVertex3f(-30,30,-1.5);
-    glVertex3f(-30,-30,-1.5);
-    glVertex3f(-30,-30,-1);
-
-    glVertex3f(-30,-30,-1);
-    glVertex3f(-30,-30,-1.5);
-    glVertex3f(30,-30,-1.5);
-    glVertex3f(30,-30,-1);
-
-    glVertex3f(30,-30,-1);
-    glVertex3f(30,-30,-1.5);
-    glVertex3f(30,30,-1.5);
-    glVertex3f(30,30,-1);
-
-    glVertex3f(30,30,-1);
-    glVertex3f(30,30,-1.5);
-    glVertex3f(-30,30,-1.5);
-    glVertex3f(-30,30,-1);
-    glEnd();
-=======
-    glVertex3f(-3,-3,-1);
-    glVertex3f(3,-3,-1);
-    glVertex3f(3,3,-1);
-    glVertex3f(-3,3,-1);
-
-    glVertex3f(-3,3,-1.5);
-    glVertex3f(3,3,-1.5);
-    glVertex3f(3,-3,-1.5);
-    glVertex3f(-3,-3,-1.5);
-
-    glColor3b(1,0,0);
-    glVertex3f(-3,3,-1);
-    glVertex3f(-3,3,-1.5);
-    glVertex3f(-3,-3,-1.5);
-    glVertex3f(-3,-3,-1);
-
-    glVertex3f(-3,-3,-1);
-    glVertex3f(-3,-3,-1.5);
-    glVertex3f(3,-3,-1.5);
-    glVertex3f(3,-3,-1);
-
-    glVertex3f(3,-3,-1);
-    glVertex3f(3,-3,-1.5);
-    glVertex3f(3,3,-1.5);
-    glVertex3f(3,3,-1);
-
-    glVertex3f(3,3,-1);
-    glVertex3f(3,3,-1.5);
-    glVertex3f(-3,3,-1.5);
-    glVertex3f(-3,3,-1);
-    glEnd();
-}
-///------------------------------------------------------------T2---------------------------------------------------------------
-
-
-
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
+    drawObject();
+    glPopMatrix();
+    for(int n = 0; n< objetos.size(); n++)
+    {
+         glPushMatrix();
+            //glRotated(90, 0.0,1.0,0.0);
+            //cout<<objetos[n].facesImg[0].vetorNormal.x<<endl;
+          //  glTranslated(objetos[n].posX,objetos[n].alturaDescida,objetos[n].posY);
+            glTranslated(objetos[n].posX,objetos[n].alturaDescida,objetos[n].posY);
+            glScalef(objetos[n].escala,objetos[n].escala,objetos[n].escala);
+            glRotatef(objetos[n].orientacao,0.0,1.0,0.0);
+            glRotatef(objetos[n].orientacaoEmPe,1.0,0.0,0.0);
+            drawObjectPly(n);
+            glPopMatrix();
+    }
+   glPopMatrix();
 
 }
 ///------------------------------------------------------------T2---------------------------------------------------------------
 
-<<<<<<< HEAD
 
 
 
@@ -1057,16 +868,6 @@ Timer();
     else
         wallCreator();
 
-=======
-void display(void)
-{
-
-    if(modoNavegacao)
-        scene();
-    else
-        wallCreator();
-
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 
     barraT->setAltura(altura);
 
@@ -1109,25 +910,31 @@ void keyboard (unsigned char key, int x, int y)
         if(esp>0)
         esp-=0.5f;
         break;
-<<<<<<< HEAD
      case 'm':
-=======
-    case 'n':
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
         if(modoNavegacao)
             modoNavegacao = false;
         else
             modoNavegacao = true;
         break;
-<<<<<<< HEAD
      case 'p':
         if(modoPly)
             modoPly = false;
         else
+        {
+
+            cout<<"MODO PLY ATIVADO"<<endl;
+            cout<<"Digite o angulo que deseja para seu objeto"<<endl;
+            cin>>novoAng;
+            cout<<"Digite qual objeto voce deseja(formiga, vaca, boneco de neve)"<<endl;
+            cout<<"Para criar um formiga, digite F"<<endl;
+            cout<<"Para criar uma vaca, digite V"<<endl;
+            cout<<"Para criar um boneco de neve, digite B"<<endl;
+            cin>>ply;
+            cout<<"Agora clique na tela para decidir a localizacao do objeto"<<endl;
             modoPly = true;
+        }
+
         break;
-=======
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
     }
     g_key[key] = true;
 }
@@ -1139,14 +946,13 @@ void specialKeysPress (int key, int x, int y)
     switch (tolower(key))
     {
     case GLUT_KEY_UP:
-        if(!modoNavegacao)
         altura++;
-        olhoY-=0.5;
+        olhoY-=2.5;
         break;
     case GLUT_KEY_DOWN:
         if(altura>0)
         altura--;
-        olhoY+=0.5;
+        olhoY+=2.5;
         break;
     case GLUT_KEY_RIGHT:
 
@@ -1194,7 +1000,6 @@ void specialKeysPress (int key, int x, int y)
 // Motion callback
 void motion(int x, int y )
 {
-<<<<<<< HEAD
 
     if(modoNavegacao)
     {
@@ -1208,38 +1013,6 @@ void motion(int x, int y )
         last_y = y;
     }
 
-=======
-    if(modoNavegacao)
-    {
-        rotationX += (float) (y - last_y);
-        rotationY += (float) (x - last_x);
-
-        last_x = x;
-        last_y = y;
-
-    }else
-    {
-        static bool just_warped = false;
-
-        if(just_warped)
-        {
-            just_warped = false;
-            return;
-        }
-
-        int dx = x - width/2;
-        int dy = y - height/2;
-
-        if(inverseMouse) dy = height/2-y;
-
-        if(dx) g_camera.RotateYaw(g_rotation_speed*dx);
-        if(dy) g_camera.RotatePitch(g_rotation_speed*dy);
-
-        if(!releaseMouse)	glutWarpPointer(width/2, height/2);
-
-        just_warped = true;
-    }
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
 }
 
 
@@ -1278,10 +1051,8 @@ void mouse(int button, int state, int x, int y)
                 }
             }else
             {
-            ifstream arquivoNovo;
-            arquivoNovo.open("cow.ply");
-
-            leArquivoPly(arquivoNovo, posZ*30, posY*30);
+            leArquivoPly(posZ*30, posY*30, novoAng, ply);
+            modoPly = false;
             }
 
             //grupos[grupoAtual].verticesGrupo2.push_back(newVertice);
@@ -1290,11 +1061,7 @@ void mouse(int button, int state, int x, int y)
 
     }
 
-<<<<<<< HEAD
     if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && !modoNavegacao )
-=======
-    if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && !modoNavegacao)
->>>>>>> 8083b796adfdc5b09a6fd3c3137a4cff2592171e
     {
         if(grupos[grupoAtual].verticesGrupo1.size()>0)
         {
